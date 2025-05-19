@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend:/app
+    environment:
+      - TZ=Asia/Amman
+    command: >
+      uvicorn src.my_smart_scan_app.main:app
+      --host 0.0.0.0 --port 8001 --reload
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NEXT_PUBLIC_API_URL=http://192.168.1.75:8001
+    command: ["npm", "run", "dev"]
+
+networks:
+  default:
+    name: my-smart-scan-app_default

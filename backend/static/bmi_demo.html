@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8" />
+    <title>حاسبة مؤشر كتلة الجسم (BMI)</title>
+</head>
+<body>
+    <h2>حاسبة مؤشر كتلة الجسم (BMI)</h2>
+
+    <label for="height">الطول (متر):</label>
+    <input type="number" id="height" step="0.01" /><br /><br />
+
+    <label for="weight">الوزن (كيلوغرام):</label>
+    <input type="number" id="weight" step="0.1" /><br /><br />
+
+    <button onclick="calculateBMI()">احسب BMI</button><br /><br />
+
+    <label for="result">النتيجة:</label>
+    <input type="text" id="result" readonly />
+
+    <script>
+        async function calculateBMI() {
+            const height = parseFloat(document.getElementById("height").value);
+            const weight = parseFloat(document.getElementById("weight").value);
+
+            if (!height || !weight || height <= 0) {
+                alert("يرجى إدخال قيم صحيحة للطول والوزن");
+                return;
+            }
+
+            try {
+                const response = await fetch('/calculate_bmi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ height: height, weight: weight })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    alert("خطأ: " + (errData.error || "حدث خطأ غير معروف"));
+                    return;
+                }
+
+                const data = await response.json();
+                document.getElementById("result").value = data.bmi;
+
+            } catch (error) {
+                alert("فشل في الاتصال بالخادم: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
